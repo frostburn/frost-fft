@@ -1,0 +1,46 @@
+{
+  "name": "frost-fft",
+  "version": "0.0.1",
+  "description": "Fast Fourier Transform (FFT) implementation in TypeScript using the Cooley–Tukey algorithm",
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/frostburn"
+  },
+  "main": "dist/index",
+  "files": [
+    "dist"
+  ],
+  "types": "dist/index.d.ts",
+  "license": "MIT",
+  "keywords": [
+    "FFT",
+    "Fourier",
+    "Fast Fourier Transformation",
+    "Typescript"
+  ],
+  "author": "Lumi Pakkanen",
+  "bugs": {
+    "url": "https://github.com/frostburn/frost-fft/issues"
+  },
+  "homepage": "https://github.com/frostburn/frost-fft#readme",
+  "scripts": {
+    "lint": "gts lint",
+    "clean": "gts clean",
+    "compile": "tsc",
+    "fix": "gts fix",
+    "prepare": "npm run compile",
+    "pretest": "npm run compile",
+    "posttest": "npm run lint",
+    "test": "vitest",
+    "doc": "typedoc src/index.ts . --name frost-fft"
+  },
+  "devDependencies": {
+    "@types/jsdom": "^21.1.6",
+    "@types/node": "20.8.2",
+    "gts": "^5.2.0",
+    "jsdom": "^23.0.1",
+    "typedoc": "^0.25.4",
+    "typescript": "~5.2.0",
+    "vitest": "^0.34.6"
+  }
+}
