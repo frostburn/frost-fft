@@ -13,6 +13,18 @@ export function fft(realIn: Float64Array, imagIn: Float64Array) {
   const N = realIn.length;
   const realOut = new Float64Array(N);
   const imagOut = new Float64Array(N);
+  if (N === 4) {
+    realOut[0] = realIn[0] + realIn[1] + realIn[2] + realIn[3];
+    realOut[1] = realIn[0] + imagIn[1] - realIn[2] - imagIn[3];
+    realOut[2] = realIn[0] - realIn[1] + realIn[2] - realIn[3];
+    realOut[3] = realIn[0] - imagIn[1] - realIn[2] + imagIn[3];
+
+    imagOut[0] = imagIn[0] + imagIn[1] + imagIn[2] + imagIn[3];
+    imagOut[1] = imagIn[0] - realIn[1] - imagIn[2] + realIn[3];
+    imagOut[2] = imagIn[0] - imagIn[1] + imagIn[2] - imagIn[3];
+    imagOut[3] = imagIn[0] + realIn[1] - imagIn[2] - realIn[3];
+    return [realOut, imagOut];
+  }
   if (N === 2) {
     realOut[0] = realIn[0] + realIn[1];
     realOut[1] = realIn[0] - realIn[1];
@@ -85,6 +97,18 @@ export function ifft(realIn: Float64Array, imagIn: Float64Array) {
   const N = realIn.length;
   const realOut = new Float64Array(N);
   const imagOut = new Float64Array(N);
+  if (N === 4) {
+    realOut[0] = realIn[0] + realIn[1] + realIn[2] + realIn[3];
+    realOut[1] = realIn[0] - imagIn[1] - realIn[2] + imagIn[3];
+    realOut[2] = realIn[0] - realIn[1] + realIn[2] - realIn[3];
+    realOut[3] = realIn[0] + imagIn[1] - realIn[2] - imagIn[3];
+
+    imagOut[0] = imagIn[0] + imagIn[1] + imagIn[2] + imagIn[3];
+    imagOut[1] = imagIn[0] + realIn[1] - imagIn[2] - realIn[3];
+    imagOut[2] = imagIn[0] - imagIn[1] + imagIn[2] - imagIn[3];
+    imagOut[3] = imagIn[0] - realIn[1] - imagIn[2] + realIn[3];
+    return [realOut, imagOut];
+  }
   if (N === 2) {
     realOut[0] = realIn[0] + realIn[1];
     realOut[1] = realIn[0] - realIn[1];
