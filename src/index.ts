@@ -13,6 +13,13 @@ export function fft(realIn: Float64Array, imagIn: Float64Array) {
   const N = realIn.length;
   const realOut = new Float64Array(N);
   const imagOut = new Float64Array(N);
+  if (N === 2) {
+    realOut[0] = realIn[0] + realIn[1];
+    realOut[1] = realIn[0] - realIn[1];
+    imagOut[0] = imagIn[0] + imagIn[1];
+    imagOut[1] = imagIn[0] - imagIn[1];
+    return [realOut, imagOut];
+  }
   if (N === 1) {
     realOut[0] = realIn[0];
     imagOut[0] = imagIn[0];
@@ -28,22 +35,42 @@ export function fft(realIn: Float64Array, imagIn: Float64Array) {
   );
 
   const M = N >>> 1;
-  const TAU_OVER_N = TAU / N;
+
+  realOut[0] = realEvens[0] + realOdds[0];
+  realOut[M] = realEvens[0] - realOdds[0];
+  imagOut[0] = imagEvens[0] + imagOdds[0];
+  imagOut[M] = imagEvens[0] - imagOdds[0];
+
   const cosines = COSINES[M] ?? [];
   const sines = SINES[M] ?? [];
-  for (let k = 0; k < M; ++k) {
-    const realZ = (cosines[k] = cosines[k] ?? Math.cos(k * TAU_OVER_N));
-    const imagZ = -(sines[k] = sines[k] ?? Math.sin(k * TAU_OVER_N));
-    const realQ = realOdds[k] * realZ - imagOdds[k] * imagZ;
-    const imagQ = realOdds[k] * imagZ + imagOdds[k] * realZ;
-    realOut[k] = realEvens[k] + realQ;
-    imagOut[k] = imagEvens[k] + imagQ;
+  if (cosines.length) {
+    for (let k = 1; k < M; ++k) {
+      const realZ = cosines[k];
+      const imagZ = -sines[k];
+      const realQ = realOdds[k] * realZ - imagOdds[k] * imagZ;
+      const imagQ = realOdds[k] * imagZ + imagOdds[k] * realZ;
+      realOut[k] = realEvens[k] + realQ;
+      imagOut[k] = imagEvens[k] + imagQ;
 
-    realOut[k + M] = realEvens[k] - realQ;
-    imagOut[k + M] = imagEvens[k] - imagQ;
+      realOut[k + M] = realEvens[k] - realQ;
+      imagOut[k + M] = imagEvens[k] - imagQ;
+    }
+  } else {
+    const TAU_OVER_N = TAU / N;
+    for (let k = 1; k < M; ++k) {
+      const realZ = (cosines[k] = Math.cos(k * TAU_OVER_N));
+      const imagZ = -(sines[k] = Math.sin(k * TAU_OVER_N));
+      const realQ = realOdds[k] * realZ - imagOdds[k] * imagZ;
+      const imagQ = realOdds[k] * imagZ + imagOdds[k] * realZ;
+      realOut[k] = realEvens[k] + realQ;
+      imagOut[k] = imagEvens[k] + imagQ;
+
+      realOut[k + M] = realEvens[k] - realQ;
+      imagOut[k + M] = imagEvens[k] - imagQ;
+    }
+    COSINES[M] = cosines;
+    SINES[M] = sines;
   }
-  COSINES[M] = cosines;
-  SINES[M] = sines;
 
   return [realOut, imagOut];
 }
@@ -58,6 +85,13 @@ export function ifft(realIn: Float64Array, imagIn: Float64Array) {
   const N = realIn.length;
   const realOut = new Float64Array(N);
   const imagOut = new Float64Array(N);
+  if (N === 2) {
+    realOut[0] = realIn[0] + realIn[1];
+    realOut[1] = realIn[0] - realIn[1];
+    imagOut[0] = imagIn[0] + imagIn[1];
+    imagOut[1] = imagIn[0] - imagIn[1];
+    return [realOut, imagOut];
+  }
   if (N === 1) {
     realOut[0] = realIn[0];
     imagOut[0] = imagIn[0];
@@ -73,22 +107,42 @@ export function ifft(realIn: Float64Array, imagIn: Float64Array) {
   );
 
   const M = N >>> 1;
-  const TAU_OVER_N = TAU / N;
+
+  realOut[0] = realEvens[0] + realOdds[0];
+  realOut[M] = realEvens[0] - realOdds[0];
+  imagOut[0] = imagEvens[0] + imagOdds[0];
+  imagOut[M] = imagEvens[0] - imagOdds[0];
+
   const cosines = COSINES[M] ?? [];
   const sines = SINES[M] ?? [];
-  for (let k = 0; k < M; ++k) {
-    const realZ = (cosines[k] = cosines[k] ?? Math.cos(k * TAU_OVER_N));
-    const imagZ = (sines[k] = sines[k] ?? Math.sin(k * TAU_OVER_N));
-    const realQ = realOdds[k] * realZ - imagOdds[k] * imagZ;
-    const imagQ = realOdds[k] * imagZ + imagOdds[k] * realZ;
-    realOut[k] = realEvens[k] + realQ;
-    imagOut[k] = imagEvens[k] + imagQ;
+  if (cosines.length) {
+    for (let k = 1; k < M; ++k) {
+      const realZ = cosines[k];
+      const imagZ = sines[k];
+      const realQ = realOdds[k] * realZ - imagOdds[k] * imagZ;
+      const imagQ = realOdds[k] * imagZ + imagOdds[k] * realZ;
+      realOut[k] = realEvens[k] + realQ;
+      imagOut[k] = imagEvens[k] + imagQ;
 
-    realOut[k + M] = realEvens[k] - realQ;
-    imagOut[k + M] = imagEvens[k] - imagQ;
+      realOut[k + M] = realEvens[k] - realQ;
+      imagOut[k + M] = imagEvens[k] - imagQ;
+    }
+  } else {
+    const TAU_OVER_N = TAU / N;
+    for (let k = 1; k < M; ++k) {
+      const realZ = (cosines[k] = Math.cos(k * TAU_OVER_N));
+      const imagZ = (sines[k] = Math.sin(k * TAU_OVER_N));
+      const realQ = realOdds[k] * realZ - imagOdds[k] * imagZ;
+      const imagQ = realOdds[k] * imagZ + imagOdds[k] * realZ;
+      realOut[k] = realEvens[k] + realQ;
+      imagOut[k] = imagEvens[k] + imagQ;
+
+      realOut[k + M] = realEvens[k] - realQ;
+      imagOut[k + M] = imagEvens[k] - imagQ;
+    }
+    COSINES[M] = cosines;
+    SINES[M] = sines;
   }
-  COSINES[M] = cosines;
-  SINES[M] = sines;
 
   return [realOut, imagOut];
 }
