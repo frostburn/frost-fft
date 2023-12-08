@@ -4,6 +4,15 @@ const COSINES: number[][] = [];
 const SINES: number[][] = [];
 
 /**
+ * Calculate the smallest power of two greater or equal to the input value.
+ * @param x Integer to compare to.
+ * @returns Smallest `2**n` such that `x <= 2**n`.
+ */
+export function ceilPow2(x: number) {
+  return 1 << (32 - Math.clz32(x - 1));
+}
+
+/**
  * Calculate the unnormalized forward discrete Fourier transform.
  * @param realIn Real components of the signal.
  * @param imagIn Imaginary components of the signal.
@@ -11,6 +20,15 @@ const SINES: number[][] = [];
  */
 export function fft(realIn: Float64Array, imagIn: Float64Array) {
   const N = realIn.length;
+  if (N !== ceilPow2(N)) {
+    throw new Error('Length must be a power of two.');
+  }
+  if (imagIn.length !== N) {
+    throw new Error(
+      'Must have an equal number of real and imaginary components'
+    );
+  }
+
   const realOut = new Float64Array(N);
   const imagOut = new Float64Array(N);
   if (N === 4) {
@@ -146,6 +164,14 @@ function _fft(realIn: Float64Array, imagIn: Float64Array) {
  */
 export function ifft(realIn: Float64Array, imagIn: Float64Array) {
   const N = realIn.length;
+  if (N !== ceilPow2(N)) {
+    throw new Error('Length must be a power of two.');
+  }
+  if (imagIn.length !== N) {
+    throw new Error(
+      'Must have an equal number of real and imaginary components'
+    );
+  }
   const realOut = new Float64Array(N);
   const imagOut = new Float64Array(N);
   if (N === 4) {

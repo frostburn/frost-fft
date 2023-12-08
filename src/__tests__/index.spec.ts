@@ -1,5 +1,5 @@
 import {describe, it, expect} from 'vitest';
-import {fft, ifft} from '..';
+import {ceilPow2, fft, ifft} from '..';
 
 function ft(realIn: Float64Array, imagIn: Float64Array) {
   const N = realIn.length;
@@ -66,6 +66,7 @@ describe('Fast Fourier transform', () => {
       }
     }
   });
+
   it('calculates the coefficients for a cosine', () => {
     const N = 16;
     const signal = new Float64Array(N).map((_, k) =>
@@ -86,6 +87,19 @@ describe('Fast Fourier transform', () => {
       expect(realCoefs[i]).toBeCloseTo(0);
       expect(imagCoefs[i]).toBeCloseTo(0);
     }
+  });
+
+  it('throws if the input is not a power of two', () => {
+    const N = 5;
+    const real = new Float64Array(N);
+    const imag = new Float64Array(N);
+    expect(() => fft(real, imag)).toThrow();
+  });
+
+  it('throws if the input lengths do not match', () => {
+    const real = new Float64Array(4);
+    const imag = new Float64Array(8);
+    expect(() => fft(real, imag)).toThrow();
   });
 });
 
@@ -165,5 +179,29 @@ describe('Inverse fast Fourier transform', () => {
       expect(realOut[i]).toBeCloseTo(real[i] * N);
       expect(imagOut[i]).toBeCloseTo(imag[i] * N);
     }
+  });
+
+  it('throws if the input is not a power of two', () => {
+    const N = 3;
+    const real = new Float64Array(N);
+    const imag = new Float64Array(N);
+    expect(() => ifft(real, imag)).toThrow();
+  });
+
+  it('throws if the input lengths do not match', () => {
+    const real = new Float64Array(4);
+    const imag = new Float64Array(2);
+    expect(() => ifft(real, imag)).toThrow();
+  });
+});
+
+describe('Upper power of two', () => {
+  it.each([0, 1, 2, 3, 4, 5, 6])('matches 2**%s', n => {
+    expect(ceilPow2(1 << n)).toBe(1 << n);
+  });
+
+  it('is not less than than the input value', () => {
+    const value = Math.floor(Math.random() * 2 ** 31);
+    expect(ceilPow2(value)).not.toBeLessThan(value);
   });
 });
