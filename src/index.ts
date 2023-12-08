@@ -37,11 +37,62 @@ export function fft(realIn: Float64Array, imagIn: Float64Array) {
     imagOut[0] = imagIn[0];
     return [realOut, imagOut];
   }
-  const [realEvens, imagEvens] = fft(
+  return _fft(realIn, imagIn);
+}
+
+function _fft(realIn: Float64Array, imagIn: Float64Array) {
+  const N = realIn.length;
+  const realOut = new Float64Array(N);
+  const imagOut = new Float64Array(N);
+  if (N === 8) {
+    const realEvens0 = realIn[0] + realIn[2] + realIn[4] + realIn[6];
+    const imagEvens0 = imagIn[0] + imagIn[2] + imagIn[4] + imagIn[6];
+    const realOdds0 = realIn[1] + realIn[3] + realIn[5] + realIn[7];
+    const imagOdds0 = imagIn[1] + imagIn[3] + imagIn[5] + imagIn[7];
+    realOut[0] = realEvens0 + realOdds0;
+    imagOut[0] = imagEvens0 + imagOdds0;
+    realOut[4] = realEvens0 - realOdds0;
+    imagOut[4] = imagEvens0 - imagOdds0;
+
+    const realEvens1 = realIn[0] + imagIn[2] - realIn[4] - imagIn[6];
+    const imagEvens1 = imagIn[0] - realIn[2] - imagIn[4] + realIn[6];
+    const realOdds1 = realIn[1] + imagIn[3] - realIn[5] - imagIn[7];
+    const imagOdds1 = imagIn[1] - realIn[3] - imagIn[5] + realIn[7];
+    const realQ1 = (realOdds1 + imagOdds1) * 0.7071067811865475;
+    const imagQ1 = (realOdds1 - imagOdds1) * 0.7071067811865475;
+    realOut[1] = realEvens1 + realQ1;
+    imagOut[1] = imagEvens1 - imagQ1;
+    realOut[5] = realEvens1 - realQ1;
+    imagOut[5] = imagEvens1 + imagQ1;
+
+    const realEvens2 = realIn[0] - realIn[2] + realIn[4] - realIn[6];
+    const imagEvens2 = imagIn[0] - imagIn[2] + imagIn[4] - imagIn[6];
+    const realOdds2 = realIn[1] - realIn[3] + realIn[5] - realIn[7];
+    const imagOdds2 = imagIn[1] - imagIn[3] + imagIn[5] - imagIn[7];
+    realOut[2] = realEvens2 + imagOdds2;
+    imagOut[2] = imagEvens2 - realOdds2;
+    realOut[6] = realEvens2 - imagOdds2;
+    imagOut[6] = imagEvens2 + realOdds2;
+
+    const realEvens3 = realIn[0] - imagIn[2] - realIn[4] + imagIn[6];
+    const imagEvens3 = imagIn[0] + realIn[2] - imagIn[4] - realIn[6];
+    const realOdds3 = realIn[1] - imagIn[3] - realIn[5] + imagIn[7];
+    const imagOdds3 = imagIn[1] + realIn[3] - imagIn[5] - realIn[7];
+    const realQ3 = (realOdds3 - imagOdds3) * 0.7071067811865475;
+    const imagQ3 = (realOdds3 + imagOdds3) * 0.7071067811865475;
+    realOut[3] = realEvens3 - realQ3;
+    imagOut[3] = imagEvens3 - imagQ3;
+    realOut[7] = realEvens3 + realQ3;
+    imagOut[7] = imagEvens3 + imagQ3;
+
+    return [realOut, imagOut];
+  }
+
+  const [realEvens, imagEvens] = _fft(
     realIn.filter((_, k) => !(k & 1)),
     imagIn.filter((_, k) => !(k & 1))
   );
-  const [realOdds, imagOdds] = fft(
+  const [realOdds, imagOdds] = _fft(
     realIn.filter((_, k) => k & 1),
     imagIn.filter((_, k) => k & 1)
   );
@@ -121,11 +172,61 @@ export function ifft(realIn: Float64Array, imagIn: Float64Array) {
     imagOut[0] = imagIn[0];
     return [realOut, imagOut];
   }
-  const [realEvens, imagEvens] = ifft(
+  return _ifft(realIn, imagIn);
+}
+
+function _ifft(realIn: Float64Array, imagIn: Float64Array) {
+  const N = realIn.length;
+  const realOut = new Float64Array(N);
+  const imagOut = new Float64Array(N);
+  if (N === 8) {
+    const realEvens0 = realIn[0] + realIn[2] + realIn[4] + realIn[6];
+    const imagEvens0 = imagIn[0] + imagIn[2] + imagIn[4] + imagIn[6];
+    const realOdds0 = realIn[1] + realIn[3] + realIn[5] + realIn[7];
+    const imagOdds0 = imagIn[1] + imagIn[3] + imagIn[5] + imagIn[7];
+    realOut[0] = realEvens0 + realOdds0;
+    imagOut[0] = imagEvens0 + imagOdds0;
+    realOut[4] = realEvens0 - realOdds0;
+    imagOut[4] = imagEvens0 - imagOdds0;
+
+    const realEvens1 = realIn[0] - imagIn[2] - realIn[4] + imagIn[6];
+    const imagEvens1 = imagIn[0] + realIn[2] - imagIn[4] - realIn[6];
+    const realOdds1 = realIn[1] - imagIn[3] - realIn[5] + imagIn[7];
+    const imagOdds1 = imagIn[1] + realIn[3] - imagIn[5] - realIn[7];
+    const realQ1 = (realOdds1 - imagOdds1) * 0.7071067811865475;
+    const imagQ1 = (realOdds1 + imagOdds1) * 0.7071067811865475;
+    realOut[1] = realEvens1 + realQ1;
+    imagOut[1] = imagEvens1 + imagQ1;
+    realOut[5] = realEvens1 - realQ1;
+    imagOut[5] = imagEvens1 - imagQ1;
+
+    const realEvens2 = realIn[0] - realIn[2] + realIn[4] - realIn[6];
+    const imagEvens2 = imagIn[0] - imagIn[2] + imagIn[4] - imagIn[6];
+    const realOdds2 = realIn[1] - realIn[3] + realIn[5] - realIn[7];
+    const imagOdds2 = imagIn[1] - imagIn[3] + imagIn[5] - imagIn[7];
+    realOut[2] = realEvens2 - imagOdds2;
+    imagOut[2] = imagEvens2 + realOdds2;
+    realOut[6] = realEvens2 + imagOdds2;
+    imagOut[6] = imagEvens2 - realOdds2;
+
+    const realEvens3 = realIn[0] + imagIn[2] - realIn[4] - imagIn[6];
+    const imagEvens3 = imagIn[0] - realIn[2] - imagIn[4] + realIn[6];
+    const realOdds3 = realIn[1] + imagIn[3] - realIn[5] - imagIn[7];
+    const imagOdds3 = imagIn[1] - realIn[3] - imagIn[5] + realIn[7];
+    const realQ3 = (realOdds3 + imagOdds3) * 0.7071067811865475;
+    const imagQ3 = (realOdds3 - imagOdds3) * 0.7071067811865475;
+    realOut[3] = realEvens3 - realQ3;
+    imagOut[3] = imagEvens3 + imagQ3;
+    realOut[7] = realEvens3 + realQ3;
+    imagOut[7] = imagEvens3 - imagQ3;
+
+    return [realOut, imagOut];
+  }
+  const [realEvens, imagEvens] = _ifft(
     realIn.filter((_, k) => !(k & 1)),
     imagIn.filter((_, k) => !(k & 1))
   );
-  const [realOdds, imagOdds] = ifft(
+  const [realOdds, imagOdds] = _ifft(
     realIn.filter((_, k) => k & 1),
     imagIn.filter((_, k) => k & 1)
   );

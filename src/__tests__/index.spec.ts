@@ -1,6 +1,22 @@
 import {describe, it, expect} from 'vitest';
 import {fft, ifft} from '..';
 
+function ft(realIn: Float64Array, imagIn: Float64Array) {
+  const N = realIn.length;
+  const realOut = new Float64Array(N);
+  const imagOut = new Float64Array(N);
+  for (let i = 0; i < N; ++i) {
+    for (let j = 0; j < N; ++j) {
+      const theta = (-2 * Math.PI * i * j) / N;
+      const realZ = Math.cos(theta);
+      const imagZ = Math.sin(theta);
+      realOut[i] += realZ * realIn[j] - imagZ * imagIn[j];
+      imagOut[i] += realZ * imagIn[j] + imagZ * realIn[j];
+    }
+  }
+  return [realOut, imagOut];
+}
+
 function ift(realIn: Float64Array, imagIn: Float64Array) {
   const N = realIn.length;
   const realOut = new Float64Array(N);
@@ -18,6 +34,38 @@ function ift(realIn: Float64Array, imagIn: Float64Array) {
 }
 
 describe('Fast Fourier transform', () => {
+  it('agrees with the naive implementation in the N = 8 base case', () => {
+    const N = 8;
+    for (let i = 0; i < N; ++i) {
+      const realIn = new Float64Array(N);
+      const imagIn = new Float64Array(N);
+      realIn[i] = 1;
+      {
+        const [realNaive, imagNaive] = ft(realIn, imagIn);
+        const [realCoefs, imagCoefs] = fft(realIn, imagIn);
+        for (let j = 0; j < N; ++j) {
+          expect(realCoefs[j], `real #${i} -> real #${j}`).toBeCloseTo(
+            realNaive[j]
+          );
+          expect(imagCoefs[j], `real #${i} -> imag #${j}`).toBeCloseTo(
+            imagNaive[j]
+          );
+        }
+      }
+      realIn[i] = 0;
+      imagIn[i] = 1;
+      const [realNaive, imagNaive] = ft(realIn, imagIn);
+      const [realCoefs, imagCoefs] = fft(realIn, imagIn);
+      for (let j = 0; j < N; ++j) {
+        expect(realCoefs[j], `imag #${i} -> real #${j}`).toBeCloseTo(
+          realNaive[j]
+        );
+        expect(imagCoefs[j], `imag #${i} -> imag #${j}`).toBeCloseTo(
+          imagNaive[j]
+        );
+      }
+    }
+  });
   it('calculates the coefficients for a cosine', () => {
     const N = 16;
     const signal = new Float64Array(N).map((_, k) =>
@@ -42,6 +90,39 @@ describe('Fast Fourier transform', () => {
 });
 
 describe('Inverse fast Fourier transform', () => {
+  it('agrees with the naive implementation in the N = 8 base case', () => {
+    const N = 8;
+    for (let i = 0; i < N; ++i) {
+      const realIn = new Float64Array(N);
+      const imagIn = new Float64Array(N);
+      realIn[i] = 1;
+      {
+        const [realNaive, imagNaive] = ift(realIn, imagIn);
+        const [realCoefs, imagCoefs] = ifft(realIn, imagIn);
+        for (let j = 0; j < N; ++j) {
+          expect(realCoefs[j], `real #${i} -> real #${j}`).toBeCloseTo(
+            realNaive[j]
+          );
+          expect(imagCoefs[j], `real #${i} -> imag #${j}`).toBeCloseTo(
+            imagNaive[j]
+          );
+        }
+      }
+      realIn[i] = 0;
+      imagIn[i] = 1;
+      const [realNaive, imagNaive] = ift(realIn, imagIn);
+      const [realCoefs, imagCoefs] = ifft(realIn, imagIn);
+      for (let j = 0; j < N; ++j) {
+        expect(realCoefs[j], `imag #${i} -> real #${j}`).toBeCloseTo(
+          realNaive[j]
+        );
+        expect(imagCoefs[j], `imag #${i} -> imag #${j}`).toBeCloseTo(
+          imagNaive[j]
+        );
+      }
+    }
+  });
+
   it('creates a cosine', () => {
     const N = 16;
     const real = new Float64Array(N);
