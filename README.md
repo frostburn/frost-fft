@@ -11,3 +11,11 @@ const [realCoefs, imagCoefs] = fft(
   signal.map(() => 0)
 );
 ```
+
+## Documentation ##
+Documentation is hosted at the project [Github pages](https://frostburn.github.io/frost-fft).
+
+To generate documentation locally run:
+```bash
+npm run doc
+```
