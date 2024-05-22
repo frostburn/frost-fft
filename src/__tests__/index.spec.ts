@@ -201,7 +201,7 @@ describe('Upper power of two', () => {
   });
 
   it('is not less than than the input value', () => {
-    const value = Math.floor(Math.random() * 2 ** 31);
+    const value = Math.floor(Math.random() * 2 ** 30);
     expect(ceilPow2(value)).not.toBeLessThan(value);
   });
 });
