@@ -1,6 +1,6 @@
 {
   "name": "frost-fft",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Fast Fourier Transform (FFT) implementation in TypeScript using the Cooley–Tukey algorithm for power-of-2 input lengths",
   "funding": {
     "type": "github",
