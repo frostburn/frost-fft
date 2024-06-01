@@ -1,7 +1,41 @@
-const TAU = 2 * Math.PI;
-
 const COSINES: number[][] = [];
 const SINES: number[][] = [];
+
+COSINES[2] = [NaN, 0];
+SINES[2] = [NaN, 1];
+
+/**
+ * Reset internal tables. Used during benchmarking.
+ */
+export function _resetTables() {
+  COSINES.length = 0;
+  SINES.length = 0;
+  COSINES[2] = [NaN, 0];
+  SINES[2] = [NaN, 1];
+}
+
+function getTables(M: number): [number[], number[]] {
+  const cosines = COSINES[M] ?? [];
+  const sines = SINES[M] ?? [];
+  if (cosines.length) {
+    return [cosines, sines];
+  }
+  cosines.length = M;
+  sines.length = M;
+  const L = M >>> 1;
+  const [c, s] = getTables(L);
+  // i = 0 intentionally left undefined
+  for (let i = 1; i < L; ++i) {
+    cosines[i << 1] = c[i];
+    sines[i << 1] = s[i];
+  }
+  const PI_OVER_M = Math.PI / M;
+  for (let i = 1; i < L; i += 2) {
+    sines[i] = sines[M - i] = cosines[L - i] = Math.sin(i * PI_OVER_M);
+    cosines[L + i] = -cosines[L - i];
+  }
+  return [cosines, sines];
+}
 
 /**
  * Calculate the smallest power of two greater or equal to the input value.
@@ -131,35 +165,17 @@ function _fft(
   imagOut[0] = imagEvens[0] + imagOdds[0];
   imagOut[M] = imagEvens[0] - imagOdds[0];
 
-  const cosines = COSINES[M] ?? [];
-  const sines = SINES[M] ?? [];
-  if (cosines.length) {
-    for (let k = 1; k < M; ++k) {
-      const realZ = cosines[k];
-      const imagZ = -sines[k];
-      const realQ = realOdds[k] * realZ - imagOdds[k] * imagZ;
-      const imagQ = realOdds[k] * imagZ + imagOdds[k] * realZ;
-      realOut[k] = realEvens[k] + realQ;
-      imagOut[k] = imagEvens[k] + imagQ;
+  const [cosines, sines] = getTables(M);
+  for (let k = 1; k < M; ++k) {
+    const realZ = cosines[k];
+    const imagZ = -sines[k];
+    const realQ = realOdds[k] * realZ - imagOdds[k] * imagZ;
+    const imagQ = realOdds[k] * imagZ + imagOdds[k] * realZ;
+    realOut[k] = realEvens[k] + realQ;
+    imagOut[k] = imagEvens[k] + imagQ;
 
-      realOut[k + M] = realEvens[k] - realQ;
-      imagOut[k + M] = imagEvens[k] - imagQ;
-    }
-  } else {
-    const TAU_OVER_N = TAU / N;
-    for (let k = 1; k < M; ++k) {
-      const realZ = (cosines[k] = Math.cos(k * TAU_OVER_N));
-      const imagZ = -(sines[k] = Math.sin(k * TAU_OVER_N));
-      const realQ = realOdds[k] * realZ - imagOdds[k] * imagZ;
-      const imagQ = realOdds[k] * imagZ + imagOdds[k] * realZ;
-      realOut[k] = realEvens[k] + realQ;
-      imagOut[k] = imagEvens[k] + imagQ;
-
-      realOut[k + M] = realEvens[k] - realQ;
-      imagOut[k + M] = imagEvens[k] - imagQ;
-    }
-    COSINES[M] = cosines;
-    SINES[M] = sines;
+    realOut[k + M] = realEvens[k] - realQ;
+    imagOut[k + M] = imagEvens[k] - imagQ;
   }
 
   return [realOut, imagOut];
@@ -245,35 +261,17 @@ function _fftNoImagInner(realIn: Float64Array): [Float64Array, Float64Array] {
   imagOut[0] = imagEvens[0] + imagOdds[0];
   imagOut[M] = imagEvens[0] - imagOdds[0];
 
-  const cosines = COSINES[M] ?? [];
-  const sines = SINES[M] ?? [];
-  if (cosines.length) {
-    for (let k = 1; k < M; ++k) {
-      const realZ = cosines[k];
-      const imagZ = -sines[k];
-      const realQ = realOdds[k] * realZ - imagOdds[k] * imagZ;
-      const imagQ = realOdds[k] * imagZ + imagOdds[k] * realZ;
-      realOut[k] = realEvens[k] + realQ;
-      imagOut[k] = imagEvens[k] + imagQ;
+  const [cosines, sines] = getTables(M);
+  for (let k = 1; k < M; ++k) {
+    const realZ = cosines[k];
+    const imagZ = -sines[k];
+    const realQ = realOdds[k] * realZ - imagOdds[k] * imagZ;
+    const imagQ = realOdds[k] * imagZ + imagOdds[k] * realZ;
+    realOut[k] = realEvens[k] + realQ;
+    imagOut[k] = imagEvens[k] + imagQ;
 
-      realOut[k + M] = realEvens[k] - realQ;
-      imagOut[k + M] = imagEvens[k] - imagQ;
-    }
-  } else {
-    const TAU_OVER_N = TAU / N;
-    for (let k = 1; k < M; ++k) {
-      const realZ = (cosines[k] = Math.cos(k * TAU_OVER_N));
-      const imagZ = -(sines[k] = Math.sin(k * TAU_OVER_N));
-      const realQ = realOdds[k] * realZ - imagOdds[k] * imagZ;
-      const imagQ = realOdds[k] * imagZ + imagOdds[k] * realZ;
-      realOut[k] = realEvens[k] + realQ;
-      imagOut[k] = imagEvens[k] + imagQ;
-
-      realOut[k + M] = realEvens[k] - realQ;
-      imagOut[k + M] = imagEvens[k] - imagQ;
-    }
-    COSINES[M] = cosines;
-    SINES[M] = sines;
+    realOut[k + M] = realEvens[k] - realQ;
+    imagOut[k + M] = imagEvens[k] - imagQ;
   }
 
   return [realOut, imagOut];
@@ -393,35 +391,18 @@ function _ifft(
   imagOut[0] = imagEvens[0] + imagOdds[0];
   imagOut[M] = imagEvens[0] - imagOdds[0];
 
-  const cosines = COSINES[M] ?? [];
-  const sines = SINES[M] ?? [];
-  if (cosines.length) {
-    for (let k = 1; k < M; ++k) {
-      const realZ = cosines[k];
-      const imagZ = sines[k];
-      const realQ = realOdds[k] * realZ - imagOdds[k] * imagZ;
-      const imagQ = realOdds[k] * imagZ + imagOdds[k] * realZ;
-      realOut[k] = realEvens[k] + realQ;
-      imagOut[k] = imagEvens[k] + imagQ;
+  const [cosines, sines] = getTables(M);
 
-      realOut[k + M] = realEvens[k] - realQ;
-      imagOut[k + M] = imagEvens[k] - imagQ;
-    }
-  } else {
-    const TAU_OVER_N = TAU / N;
-    for (let k = 1; k < M; ++k) {
-      const realZ = (cosines[k] = Math.cos(k * TAU_OVER_N));
-      const imagZ = (sines[k] = Math.sin(k * TAU_OVER_N));
-      const realQ = realOdds[k] * realZ - imagOdds[k] * imagZ;
-      const imagQ = realOdds[k] * imagZ + imagOdds[k] * realZ;
-      realOut[k] = realEvens[k] + realQ;
-      imagOut[k] = imagEvens[k] + imagQ;
+  for (let k = 1; k < M; ++k) {
+    const realZ = cosines[k];
+    const imagZ = sines[k];
+    const realQ = realOdds[k] * realZ - imagOdds[k] * imagZ;
+    const imagQ = realOdds[k] * imagZ + imagOdds[k] * realZ;
+    realOut[k] = realEvens[k] + realQ;
+    imagOut[k] = imagEvens[k] + imagQ;
 
-      realOut[k + M] = realEvens[k] - realQ;
-      imagOut[k + M] = imagEvens[k] - imagQ;
-    }
-    COSINES[M] = cosines;
-    SINES[M] = sines;
+    realOut[k + M] = realEvens[k] - realQ;
+    imagOut[k + M] = imagEvens[k] - imagQ;
   }
 
   return [realOut, imagOut];
@@ -511,27 +492,13 @@ function _ifftReal(realIn: Float64Array, imagIn: Float64Array): Float64Array {
   realOut[0] = realEvens[0] + realOdds[0];
   realOut[M] = realEvens[0] - realOdds[0];
 
-  const cosines = COSINES[M] ?? [];
-  const sines = SINES[M] ?? [];
-  if (cosines.length) {
-    for (let k = 1; k < M; ++k) {
-      const realQ = realOdds[k] * cosines[k] - imagOdds[k] * sines[k];
-      realOut[k] = realEvens[k] + realQ;
+  const [cosines, sines] = getTables(M);
 
-      realOut[k + M] = realEvens[k] - realQ;
-    }
-  } else {
-    const TAU_OVER_N = TAU / N;
-    for (let k = 1; k < M; ++k) {
-      const realQ =
-        realOdds[k] * (cosines[k] = Math.cos(k * TAU_OVER_N)) -
-        imagOdds[k] * (sines[k] = Math.sin(k * TAU_OVER_N));
-      realOut[k] = realEvens[k] + realQ;
+  for (let k = 1; k < M; ++k) {
+    const realQ = realOdds[k] * cosines[k] - imagOdds[k] * sines[k];
+    realOut[k] = realEvens[k] + realQ;
 
-      realOut[k + M] = realEvens[k] - realQ;
-    }
-    COSINES[M] = cosines;
-    SINES[M] = sines;
+    realOut[k + M] = realEvens[k] - realQ;
   }
 
   return realOut;

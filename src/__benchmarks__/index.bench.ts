@@ -1,14 +1,17 @@
 import {describe, bench, beforeAll} from 'vitest';
 import {fft, ifft, ifftReal} from '../';
 
-describe('Empty 1024', () => {
-  beforeAll(() => {
-    const real = new Float64Array(1024);
-    const imag = new Float64Array(1024);
+beforeAll(() => {
+  // Initialize cosine tables
+  for (let i = 1; i < 16; ++i) {
+    const real = new Float64Array(1 << i);
+    const imag = new Float64Array(1 << i);
     fft(real, imag);
     ifft(real, imag);
-  });
+  }
+});
 
+describe('Empty 1024', () => {
   bench('Forward', () => {
     const real = new Float64Array(1024);
     const imag = new Float64Array(1024);
@@ -45,15 +48,6 @@ function randomData(): [Float64Array, Float64Array] {
 }
 
 describe('Random power of two', () => {
-  beforeAll(() => {
-    for (let i = 1; i < 16; ++i) {
-      const real = new Float64Array(1 << i);
-      const imag = new Float64Array(1 << i);
-      fft(real, imag);
-      ifft(real, imag);
-    }
-  });
-
   bench('Forward', () => {
     fft(...randomData());
   });
