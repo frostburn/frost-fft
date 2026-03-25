@@ -40,8 +40,8 @@ function getTables(M: number): [number[], number[]] {
 function splitComplexEvenOdd(
   realIn: Float64Array,
   imagIn: Float64Array,
+  M: number,
 ): [Float64Array, Float64Array, Float64Array, Float64Array] {
-  const M = realIn.length >>> 1;
   const realEvensIn = new Float64Array(M);
   const imagEvensIn = new Float64Array(M);
   const realOddsIn = new Float64Array(M);
@@ -55,8 +55,10 @@ function splitComplexEvenOdd(
   return [realEvensIn, imagEvensIn, realOddsIn, imagOddsIn];
 }
 
-function splitRealEvenOdd(realIn: Float64Array): [Float64Array, Float64Array] {
-  const M = realIn.length >>> 1;
+function splitRealEvenOdd(
+  realIn: Float64Array,
+  M: number,
+): [Float64Array, Float64Array] {
   const realEvensIn = new Float64Array(M);
   const realOddsIn = new Float64Array(M);
   for (let i = 0, j = 0; i < M; ++i, j += 2) {
@@ -178,12 +180,11 @@ function _fft(
     return [realOut, imagOut];
   }
 
+  const M = N >>> 1;
   const [realEvensIn, imagEvensIn, realOddsIn, imagOddsIn] =
-    splitComplexEvenOdd(realIn, imagIn);
+    splitComplexEvenOdd(realIn, imagIn, M);
   const [realEvens, imagEvens] = _fft(realEvensIn, imagEvensIn);
   const [realOdds, imagOdds] = _fft(realOddsIn, imagOddsIn);
-
-  const M = N >>> 1;
 
   realOut[0] = realEvens[0] + realOdds[0];
   realOut[M] = realEvens[0] - realOdds[0];
@@ -274,11 +275,10 @@ function _fftNoImagInner(realIn: Float64Array): [Float64Array, Float64Array] {
     return [realOut, imagOut];
   }
 
-  const [realEvensIn, realOddsIn] = splitRealEvenOdd(realIn);
+  const M = N >>> 1;
+  const [realEvensIn, realOddsIn] = splitRealEvenOdd(realIn, M);
   const [realEvens, imagEvens] = _fftNoImagInner(realEvensIn);
   const [realOdds, imagOdds] = _fftNoImagInner(realOddsIn);
-
-  const M = N >>> 1;
 
   realOut[0] = realEvens[0] + realOdds[0];
   realOut[M] = realEvens[0] - realOdds[0];
@@ -399,12 +399,11 @@ function _ifft(
 
     return [realOut, imagOut];
   }
+  const M = N >>> 1;
   const [realEvensIn, imagEvensIn, realOddsIn, imagOddsIn] =
-    splitComplexEvenOdd(realIn, imagIn);
+    splitComplexEvenOdd(realIn, imagIn, M);
   const [realEvens, imagEvens] = _ifft(realEvensIn, imagEvensIn);
   const [realOdds, imagOdds] = _ifft(realOddsIn, imagOddsIn);
-
-  const M = N >>> 1;
 
   realOut[0] = realEvens[0] + realOdds[0];
   realOut[M] = realEvens[0] - realOdds[0];
@@ -498,12 +497,11 @@ function _ifftReal(realIn: Float64Array, imagIn: Float64Array): Float64Array {
 
     return realOut;
   }
+  const M = N >>> 1;
   const [realEvensIn, imagEvensIn, realOddsIn, imagOddsIn] =
-    splitComplexEvenOdd(realIn, imagIn);
+    splitComplexEvenOdd(realIn, imagIn, M);
   const realEvens = _ifftReal(realEvensIn, imagEvensIn);
   const [realOdds, imagOdds] = _ifft(realOddsIn, imagOddsIn);
-
-  const M = N >>> 1;
 
   realOut[0] = realEvens[0] + realOdds[0];
   realOut[M] = realEvens[0] - realOdds[0];
