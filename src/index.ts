@@ -37,6 +37,35 @@ function getTables(M: number): [number[], number[]] {
   return [cosines, sines];
 }
 
+function splitComplexEvenOdd(
+  realIn: Float64Array,
+  imagIn: Float64Array,
+): [Float64Array, Float64Array, Float64Array, Float64Array] {
+  const M = realIn.length >>> 1;
+  const realEvensIn = new Float64Array(M);
+  const imagEvensIn = new Float64Array(M);
+  const realOddsIn = new Float64Array(M);
+  const imagOddsIn = new Float64Array(M);
+  for (let i = 0, j = 0; i < M; ++i, j += 2) {
+    realEvensIn[i] = realIn[j];
+    imagEvensIn[i] = imagIn[j];
+    realOddsIn[i] = realIn[j + 1];
+    imagOddsIn[i] = imagIn[j + 1];
+  }
+  return [realEvensIn, imagEvensIn, realOddsIn, imagOddsIn];
+}
+
+function splitRealEvenOdd(realIn: Float64Array): [Float64Array, Float64Array] {
+  const M = realIn.length >>> 1;
+  const realEvensIn = new Float64Array(M);
+  const realOddsIn = new Float64Array(M);
+  for (let i = 0, j = 0; i < M; ++i, j += 2) {
+    realEvensIn[i] = realIn[j];
+    realOddsIn[i] = realIn[j + 1];
+  }
+  return [realEvensIn, realOddsIn];
+}
+
 /**
  * Calculate the smallest power of two greater or equal to the input value.
  * @param x Integer to compare to.
@@ -149,14 +178,10 @@ function _fft(
     return [realOut, imagOut];
   }
 
-  const [realEvens, imagEvens] = _fft(
-    realIn.filter((_, k) => !(k & 1)),
-    imagIn.filter((_, k) => !(k & 1)),
-  );
-  const [realOdds, imagOdds] = _fft(
-    realIn.filter((_, k) => k & 1),
-    imagIn.filter((_, k) => k & 1),
-  );
+  const [realEvensIn, imagEvensIn, realOddsIn, imagOddsIn] =
+    splitComplexEvenOdd(realIn, imagIn);
+  const [realEvens, imagEvens] = _fft(realEvensIn, imagEvensIn);
+  const [realOdds, imagOdds] = _fft(realOddsIn, imagOddsIn);
 
   const M = N >>> 1;
 
@@ -249,10 +274,9 @@ function _fftNoImagInner(realIn: Float64Array): [Float64Array, Float64Array] {
     return [realOut, imagOut];
   }
 
-  const [realEvens, imagEvens] = _fftNoImagInner(
-    realIn.filter((_, k) => !(k & 1)),
-  );
-  const [realOdds, imagOdds] = _fftNoImagInner(realIn.filter((_, k) => k & 1));
+  const [realEvensIn, realOddsIn] = splitRealEvenOdd(realIn);
+  const [realEvens, imagEvens] = _fftNoImagInner(realEvensIn);
+  const [realOdds, imagOdds] = _fftNoImagInner(realOddsIn);
 
   const M = N >>> 1;
 
@@ -375,14 +399,10 @@ function _ifft(
 
     return [realOut, imagOut];
   }
-  const [realEvens, imagEvens] = _ifft(
-    realIn.filter((_, k) => !(k & 1)),
-    imagIn.filter((_, k) => !(k & 1)),
-  );
-  const [realOdds, imagOdds] = _ifft(
-    realIn.filter((_, k) => k & 1),
-    imagIn.filter((_, k) => k & 1),
-  );
+  const [realEvensIn, imagEvensIn, realOddsIn, imagOddsIn] =
+    splitComplexEvenOdd(realIn, imagIn);
+  const [realEvens, imagEvens] = _ifft(realEvensIn, imagEvensIn);
+  const [realOdds, imagOdds] = _ifft(realOddsIn, imagOddsIn);
 
   const M = N >>> 1;
 
@@ -478,14 +498,10 @@ function _ifftReal(realIn: Float64Array, imagIn: Float64Array): Float64Array {
 
     return realOut;
   }
-  const realEvens = _ifftReal(
-    realIn.filter((_, k) => !(k & 1)),
-    imagIn.filter((_, k) => !(k & 1)),
-  );
-  const [realOdds, imagOdds] = _ifft(
-    realIn.filter((_, k) => k & 1),
-    imagIn.filter((_, k) => k & 1),
-  );
+  const [realEvensIn, imagEvensIn, realOddsIn, imagOddsIn] =
+    splitComplexEvenOdd(realIn, imagIn);
+  const realEvens = _ifftReal(realEvensIn, imagEvensIn);
+  const [realOdds, imagOdds] = _ifft(realOddsIn, imagOddsIn);
 
   const M = N >>> 1;
 
