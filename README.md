@@ -18,6 +18,18 @@ const [realSignalScaled, imagSignalScaled] = ifft(realCoefs, imagCoefs);
 // The original signal reconstructed (with some floating point noise).
 const realSignal = ifftReal(realCoefs, imagCoefs).map(s => s / 256);
 ```
+## Supported imports
+Use only the package root import:
+
+```typescript
+import {fft, ifft, ifftReal} from 'frost-fft';
+```
+
+Public export path(s):
+- `frost-fft`
+
+Do not import from internal build paths such as `frost-fft/dist/*`; those are not part of the public API contract and may change.
+
 
 ## Documentation ##
 Documentation is hosted at the project [Github pages](https://frostburn.github.io/frost-fft).

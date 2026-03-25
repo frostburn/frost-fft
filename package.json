@@ -6,7 +6,7 @@
     "type": "github",
     "url": "https://github.com/sponsors/frostburn"
   },
-  "main": "dist/index",
+  "main": "dist/index.js",
   "files": [
     "dist"
   ],
@@ -41,5 +41,13 @@
     "typedoc": "^0.28.18",
     "typescript": "^5.9.3",
     "vitest": "^4.1.1"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
   }
 }
