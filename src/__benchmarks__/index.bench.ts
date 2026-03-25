@@ -40,7 +40,8 @@ function randomData(): [Float64Array, Float64Array] {
   const N = Math.floor(11 + Math.random() * 4);
   const real = new Float64Array(1 << N);
   const imag = new Float64Array(1 << N);
-  for (let i = 0; i < N; ++i) {
+  const len = real.length;
+  for (let i = 0; i < len; ++i) {
     real[i] = Math.random() * 2 - 1;
     imag[i] = Math.random() * 2 - 1;
   }
@@ -59,7 +60,8 @@ describe('Random power of two', () => {
   bench('Forward no imaginary', () => {
     const N = Math.floor(11 + Math.random() * 4);
     const real = new Float64Array(1 << N);
-    for (let i = 0; i < N; ++i) {
+    const len = real.length;
+    for (let i = 0; i < len; ++i) {
       real[i] = Math.random() * 2 - 1;
     }
     fft(real);
