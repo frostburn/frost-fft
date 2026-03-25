@@ -46,16 +46,16 @@ describe('Fast Fourier transform', () => {
           const [realCoefs1, imagCoefs1] = fft(realIn);
           for (let j = 0; j < N; ++j) {
             expect(realCoefs[j], `real #${i} -> real #${j}`).toBeCloseTo(
-              realNaive[j]
+              realNaive[j],
             );
             expect(imagCoefs[j], `real #${i} -> imag #${j}`).toBeCloseTo(
-              imagNaive[j]
+              imagNaive[j],
             );
             expect(realCoefs1[j], `real #${i} -> real #${j}`).toBeCloseTo(
-              realNaive[j]
+              realNaive[j],
             );
             expect(imagCoefs1[j], `real #${i} -> imag #${j}`).toBeCloseTo(
-              imagNaive[j]
+              imagNaive[j],
             );
           }
         }
@@ -65,10 +65,10 @@ describe('Fast Fourier transform', () => {
         const [realCoefs, imagCoefs] = fft(realIn, imagIn);
         for (let j = 0; j < N; ++j) {
           expect(realCoefs[j], `imag #${i} -> real #${j}`).toBeCloseTo(
-            realNaive[j]
+            realNaive[j],
           );
           expect(imagCoefs[j], `imag #${i} -> imag #${j}`).toBeCloseTo(
-            imagNaive[j]
+            imagNaive[j],
           );
         }
       }
@@ -78,11 +78,11 @@ describe('Fast Fourier transform', () => {
   it('calculates the coefficients for a cosine', () => {
     const N = 16;
     const signal = new Float64Array(N).map((_, k) =>
-      Math.cos((2 * Math.PI * k) / N)
+      Math.cos((2 * Math.PI * k) / N),
     );
     const [realCoefs, imagCoefs] = fft(
       signal,
-      signal.map(() => 0)
+      signal.map(() => 0),
     );
     const [realCoefs1, imagCoefs1] = fft(signal);
 
@@ -132,13 +132,13 @@ describe('Inverse fast Fourier transform', () => {
         const realCoefs1 = ifftReal(realIn, imagIn);
         for (let j = 0; j < N; ++j) {
           expect(realCoefs[j], `real #${i} -> real #${j}`).toBeCloseTo(
-            realNaive[j]
+            realNaive[j],
           );
           expect(imagCoefs[j], `real #${i} -> imag #${j}`).toBeCloseTo(
-            imagNaive[j]
+            imagNaive[j],
           );
           expect(realCoefs1[j], `real #${i} -> real #${j}`).toBeCloseTo(
-            realNaive[j]
+            realNaive[j],
           );
         }
       }
@@ -149,13 +149,13 @@ describe('Inverse fast Fourier transform', () => {
       const realCoefs1 = ifftReal(realIn, imagIn);
       for (let j = 0; j < N; ++j) {
         expect(realCoefs[j], `imag #${i} -> real #${j}`).toBeCloseTo(
-          realNaive[j]
+          realNaive[j],
         );
         expect(imagCoefs[j], `imag #${i} -> imag #${j}`).toBeCloseTo(
-          imagNaive[j]
+          imagNaive[j],
         );
         expect(realCoefs1[j], `imag #${i} -> real #${j}`).toBeCloseTo(
-          realNaive[j]
+          realNaive[j],
         );
       }
     }

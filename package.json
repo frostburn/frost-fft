@@ -33,15 +33,13 @@
     "posttest": "npm run lint",
     "test": "vitest",
     "bench": "vitest bench",
-    "doc": "typedoc src/index.ts . --name frost-fft"
+    "doc": "typedoc src/index.ts --name frost-fft"
   },
   "devDependencies": {
-    "@types/jsdom": "^21.1.7",
-    "@types/node": "^20.17.9",
-    "gts": "^5.3.1",
-    "jsdom": "^24.1.3",
-    "typedoc": "^0.25.13",
-    "typescript": "^5.4.5",
-    "vitest": "^1.6.0"
+    "@types/node": "^25.5.0",
+    "gts": "^7.0.0",
+    "typedoc": "^0.28.18",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.1"
   }
 }

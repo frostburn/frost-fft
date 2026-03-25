@@ -54,7 +54,7 @@ export function ceilPow2(x: number) {
  */
 export function fft(
   realIn: Float64Array,
-  imagIn?: Float64Array
+  imagIn?: Float64Array,
 ): [Float64Array, Float64Array] {
   const N = realIn.length;
   if (N !== ceilPow2(N)) {
@@ -65,7 +65,7 @@ export function fft(
   }
   if (imagIn.length !== N) {
     throw new Error(
-      'Must have an equal number of real and imaginary components'
+      'Must have an equal number of real and imaginary components',
     );
   }
 
@@ -100,7 +100,7 @@ export function fft(
 
 function _fft(
   realIn: Float64Array,
-  imagIn: Float64Array
+  imagIn: Float64Array,
 ): [Float64Array, Float64Array] {
   const N = realIn.length;
   const realOut = new Float64Array(N);
@@ -151,11 +151,11 @@ function _fft(
 
   const [realEvens, imagEvens] = _fft(
     realIn.filter((_, k) => !(k & 1)),
-    imagIn.filter((_, k) => !(k & 1))
+    imagIn.filter((_, k) => !(k & 1)),
   );
   const [realOdds, imagOdds] = _fft(
     realIn.filter((_, k) => k & 1),
-    imagIn.filter((_, k) => k & 1)
+    imagIn.filter((_, k) => k & 1),
   );
 
   const M = N >>> 1;
@@ -250,7 +250,7 @@ function _fftNoImagInner(realIn: Float64Array): [Float64Array, Float64Array] {
   }
 
   const [realEvens, imagEvens] = _fftNoImagInner(
-    realIn.filter((_, k) => !(k & 1))
+    realIn.filter((_, k) => !(k & 1)),
   );
   const [realOdds, imagOdds] = _fftNoImagInner(realIn.filter((_, k) => k & 1));
 
@@ -285,7 +285,7 @@ function _fftNoImagInner(realIn: Float64Array): [Float64Array, Float64Array] {
  */
 export function ifft(
   realIn: Float64Array,
-  imagIn: Float64Array
+  imagIn: Float64Array,
 ): [Float64Array, Float64Array] {
   const N = realIn.length;
   if (N !== ceilPow2(N)) {
@@ -293,7 +293,7 @@ export function ifft(
   }
   if (imagIn.length !== N) {
     throw new Error(
-      'Must have an equal number of real and imaginary components'
+      'Must have an equal number of real and imaginary components',
     );
   }
   const realOut = new Float64Array(N);
@@ -327,7 +327,7 @@ export function ifft(
 
 function _ifft(
   realIn: Float64Array,
-  imagIn: Float64Array
+  imagIn: Float64Array,
 ): [Float64Array, Float64Array] {
   const N = realIn.length;
   const realOut = new Float64Array(N);
@@ -377,11 +377,11 @@ function _ifft(
   }
   const [realEvens, imagEvens] = _ifft(
     realIn.filter((_, k) => !(k & 1)),
-    imagIn.filter((_, k) => !(k & 1))
+    imagIn.filter((_, k) => !(k & 1)),
   );
   const [realOdds, imagOdds] = _ifft(
     realIn.filter((_, k) => k & 1),
-    imagIn.filter((_, k) => k & 1)
+    imagIn.filter((_, k) => k & 1),
   );
 
   const M = N >>> 1;
@@ -416,7 +416,7 @@ function _ifft(
  */
 export function ifftReal(
   realIn: Float64Array,
-  imagIn: Float64Array
+  imagIn: Float64Array,
 ): Float64Array {
   const N = realIn.length;
   if (N !== ceilPow2(N)) {
@@ -424,7 +424,7 @@ export function ifftReal(
   }
   if (imagIn.length !== N) {
     throw new Error(
-      'Must have an equal number of real and imaginary components'
+      'Must have an equal number of real and imaginary components',
     );
   }
   const realOut = new Float64Array(N);
@@ -480,11 +480,11 @@ function _ifftReal(realIn: Float64Array, imagIn: Float64Array): Float64Array {
   }
   const realEvens = _ifftReal(
     realIn.filter((_, k) => !(k & 1)),
-    imagIn.filter((_, k) => !(k & 1))
+    imagIn.filter((_, k) => !(k & 1)),
   );
   const [realOdds, imagOdds] = _ifft(
     realIn.filter((_, k) => k & 1),
-    imagIn.filter((_, k) => k & 1)
+    imagIn.filter((_, k) => k & 1),
   );
 
   const M = N >>> 1;
