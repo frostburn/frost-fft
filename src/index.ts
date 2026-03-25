@@ -1,5 +1,6 @@
 const COSINES: number[][] = [];
 const SINES: number[][] = [];
+const SQRT1_2 = Math.SQRT1_2;
 
 COSINES[2] = [NaN, 0];
 SINES[2] = [NaN, 1];
@@ -150,8 +151,8 @@ function _fft(
     const imagEvens1 = imagIn[0] - realIn[2] - imagIn[4] + realIn[6];
     const realOdds1 = realIn[1] + imagIn[3] - realIn[5] - imagIn[7];
     const imagOdds1 = imagIn[1] - realIn[3] - imagIn[5] + realIn[7];
-    const realQ1 = (realOdds1 + imagOdds1) * 0.7071067811865475;
-    const imagQ1 = (realOdds1 - imagOdds1) * 0.7071067811865475;
+    const realQ1 = (realOdds1 + imagOdds1) * SQRT1_2;
+    const imagQ1 = (realOdds1 - imagOdds1) * SQRT1_2;
     realOut[1] = realEvens1 + realQ1;
     imagOut[1] = imagEvens1 - imagQ1;
     realOut[5] = realEvens1 - realQ1;
@@ -170,8 +171,8 @@ function _fft(
     const imagEvens3 = imagIn[0] + realIn[2] - imagIn[4] - realIn[6];
     const realOdds3 = realIn[1] - imagIn[3] - realIn[5] + imagIn[7];
     const imagOdds3 = imagIn[1] + realIn[3] - imagIn[5] - realIn[7];
-    const realQ3 = (realOdds3 - imagOdds3) * 0.7071067811865475;
-    const imagQ3 = (realOdds3 + imagOdds3) * 0.7071067811865475;
+    const realQ3 = (realOdds3 - imagOdds3) * SQRT1_2;
+    const imagQ3 = (realOdds3 + imagOdds3) * SQRT1_2;
     realOut[3] = realEvens3 - realQ3;
     imagOut[3] = imagEvens3 - imagQ3;
     realOut[7] = realEvens3 + realQ3;
@@ -194,9 +195,11 @@ function _fft(
   const [cosines, sines] = getTables(M);
   for (let k = 1; k < M; ++k) {
     const realZ = cosines[k];
-    const imagZ = -sines[k];
-    const realQ = realOdds[k] * realZ - imagOdds[k] * imagZ;
-    const imagQ = realOdds[k] * imagZ + imagOdds[k] * realZ;
+    const imagZ = sines[k];
+    const realOdd = realOdds[k];
+    const imagOdd = imagOdds[k];
+    const realQ = realOdd * realZ + imagOdd * imagZ;
+    const imagQ = imagOdd * realZ - realOdd * imagZ;
     realOut[k] = realEvens[k] + realQ;
     imagOut[k] = imagEvens[k] + imagQ;
 
@@ -247,8 +250,8 @@ function _fftNoImagInner(realIn: Float64Array): [Float64Array, Float64Array] {
     const imagEvens1 = realIn[6] - realIn[2];
     const realOdds1 = realIn[1] - realIn[5];
     const imagOdds1 = realIn[7] - realIn[3];
-    const realQ1 = (realOdds1 + imagOdds1) * 0.7071067811865475;
-    const imagQ1 = (realOdds1 - imagOdds1) * 0.7071067811865475;
+    const realQ1 = (realOdds1 + imagOdds1) * SQRT1_2;
+    const imagQ1 = (realOdds1 - imagOdds1) * SQRT1_2;
     realOut[1] = realEvens1 + realQ1;
     imagOut[1] = imagEvens1 - imagQ1;
     realOut[5] = realEvens1 - realQ1;
@@ -265,8 +268,8 @@ function _fftNoImagInner(realIn: Float64Array): [Float64Array, Float64Array] {
     const imagEvens3 = realIn[2] - realIn[6];
     const realOdds3 = realIn[1] - realIn[5];
     const imagOdds3 = realIn[3] - realIn[7];
-    const realQ3 = (realOdds3 - imagOdds3) * 0.7071067811865475;
-    const imagQ3 = (realOdds3 + imagOdds3) * 0.7071067811865475;
+    const realQ3 = (realOdds3 - imagOdds3) * SQRT1_2;
+    const imagQ3 = (realOdds3 + imagOdds3) * SQRT1_2;
     realOut[3] = realEvens3 - realQ3;
     imagOut[3] = imagEvens3 - imagQ3;
     realOut[7] = realEvens3 + realQ3;
@@ -288,9 +291,11 @@ function _fftNoImagInner(realIn: Float64Array): [Float64Array, Float64Array] {
   const [cosines, sines] = getTables(M);
   for (let k = 1; k < M; ++k) {
     const realZ = cosines[k];
-    const imagZ = -sines[k];
-    const realQ = realOdds[k] * realZ - imagOdds[k] * imagZ;
-    const imagQ = realOdds[k] * imagZ + imagOdds[k] * realZ;
+    const imagZ = sines[k];
+    const realOdd = realOdds[k];
+    const imagOdd = imagOdds[k];
+    const realQ = realOdd * realZ + imagOdd * imagZ;
+    const imagQ = imagOdd * realZ - realOdd * imagZ;
     realOut[k] = realEvens[k] + realQ;
     imagOut[k] = imagEvens[k] + imagQ;
 
@@ -370,8 +375,8 @@ function _ifft(
     const imagEvens1 = imagIn[0] + realIn[2] - imagIn[4] - realIn[6];
     const realOdds1 = realIn[1] - imagIn[3] - realIn[5] + imagIn[7];
     const imagOdds1 = imagIn[1] + realIn[3] - imagIn[5] - realIn[7];
-    const realQ1 = (realOdds1 - imagOdds1) * 0.7071067811865475;
-    const imagQ1 = (realOdds1 + imagOdds1) * 0.7071067811865475;
+    const realQ1 = (realOdds1 - imagOdds1) * SQRT1_2;
+    const imagQ1 = (realOdds1 + imagOdds1) * SQRT1_2;
     realOut[1] = realEvens1 + realQ1;
     imagOut[1] = imagEvens1 + imagQ1;
     realOut[5] = realEvens1 - realQ1;
@@ -390,8 +395,8 @@ function _ifft(
     const imagEvens3 = imagIn[0] - realIn[2] - imagIn[4] + realIn[6];
     const realOdds3 = realIn[1] + imagIn[3] - realIn[5] - imagIn[7];
     const imagOdds3 = imagIn[1] - realIn[3] - imagIn[5] + realIn[7];
-    const realQ3 = (realOdds3 + imagOdds3) * 0.7071067811865475;
-    const imagQ3 = (realOdds3 - imagOdds3) * 0.7071067811865475;
+    const realQ3 = (realOdds3 + imagOdds3) * SQRT1_2;
+    const imagQ3 = (realOdds3 - imagOdds3) * SQRT1_2;
     realOut[3] = realEvens3 - realQ3;
     imagOut[3] = imagEvens3 + imagQ3;
     realOut[7] = realEvens3 + realQ3;
@@ -415,8 +420,10 @@ function _ifft(
   for (let k = 1; k < M; ++k) {
     const realZ = cosines[k];
     const imagZ = sines[k];
-    const realQ = realOdds[k] * realZ - imagOdds[k] * imagZ;
-    const imagQ = realOdds[k] * imagZ + imagOdds[k] * realZ;
+    const realOdd = realOdds[k];
+    const imagOdd = imagOdds[k];
+    const realQ = realOdd * realZ - imagOdd * imagZ;
+    const imagQ = realOdd * imagZ + imagOdd * realZ;
     realOut[k] = realEvens[k] + realQ;
     imagOut[k] = imagEvens[k] + imagQ;
 
@@ -479,7 +486,7 @@ function _ifftReal(realIn: Float64Array, imagIn: Float64Array): Float64Array {
     const realEvens1 = realIn[0] - imagIn[2] - realIn[4] + imagIn[6];
     const realOdds1 = realIn[1] - imagIn[3] - realIn[5] + imagIn[7];
     const imagOdds1 = imagIn[1] + realIn[3] - imagIn[5] - realIn[7];
-    const realQ1 = (realOdds1 - imagOdds1) * 0.7071067811865475;
+    const realQ1 = (realOdds1 - imagOdds1) * SQRT1_2;
     realOut[1] = realEvens1 + realQ1;
     realOut[5] = realEvens1 - realQ1;
 
@@ -491,7 +498,7 @@ function _ifftReal(realIn: Float64Array, imagIn: Float64Array): Float64Array {
     const realEvens3 = realIn[0] + imagIn[2] - realIn[4] - imagIn[6];
     const realOdds3 = realIn[1] + imagIn[3] - realIn[5] - imagIn[7];
     const imagOdds3 = imagIn[1] - realIn[3] - imagIn[5] + realIn[7];
-    const realQ3 = (realOdds3 + imagOdds3) * 0.7071067811865475;
+    const realQ3 = (realOdds3 + imagOdds3) * SQRT1_2;
     realOut[3] = realEvens3 - realQ3;
     realOut[7] = realEvens3 + realQ3;
 
