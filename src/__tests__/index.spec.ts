@@ -1,5 +1,5 @@
 import {describe, it, expect} from 'vitest';
-import {ceilPow2, fft, ifft, ifftReal} from '..';
+import {ceilPow2, fft, ifft, ifftReal} from '../index.js';
 
 function ft(realIn: Float64Array, imagIn: Float64Array) {
   const N = realIn.length;

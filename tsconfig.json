@@ -1,6 +1,8 @@
 {
   "extends": "./node_modules/gts/tsconfig-google.json",
   "compilerOptions": {
+    "moduleResolution": "nodenext",
+    "module": "nodenext",
     "rootDir": "./src",
     "outDir": "dist"
   },

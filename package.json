@@ -6,6 +6,7 @@
     "type": "github",
     "url": "https://github.com/sponsors/frostburn"
   },
+  "type": "module",
   "main": "dist/index.js",
   "files": [
     "dist"
@@ -36,18 +37,16 @@
     "doc": "typedoc src/index.ts --name frost-fft"
   },
   "devDependencies": {
-    "@types/node": "^25.5.0",
+    "@types/node": "^25.5.2",
     "gts": "^7.0.0",
     "typedoc": "^0.28.18",
-    "typescript": "^5.9.3",
-    "vitest": "^4.1.1"
+    "typescript": "^6.0.2",
+    "vitest": "^4.1.2"
   },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.js",
-      "default": "./dist/index.js"
+      "import": "./dist/index.js"
     }
   }
 }
